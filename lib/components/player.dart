@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:flame/components.dart';
+import 'package:flutter/src/services/keyboard_key.g.dart';
+import 'package:flutter/src/services/raw_keyboard.dart';
 import 'package:my_fist_game/plxel_adventure.dart';
 
 enum PlayerState { idle, running }
@@ -8,7 +10,7 @@ enum PlayerState { idle, running }
 enum PlayerDecrotion { left, right, none }
 
 class Player extends SpriteAnimationGroupComponent
-    with HasGameRef<PixelAdventure> {
+    with HasGameRef<PixelAdventure>, KeyboardHandler {
   final String charator;
   Player({position, required this.charator}) : super(position: position);
 
@@ -21,6 +23,25 @@ class Player extends SpriteAnimationGroupComponent
   PlayerDecrotion playerDecrotion = PlayerDecrotion.none;
   Vector2 velocity = Vector2.zero();
   bool isFactingRight = true;
+
+  @override
+  bool onKeyEvent(RawKeyEvent event, Set<LogicalKeyboardKey> keysPressed) {
+    final isLeftKeyPressed = keysPressed.contains(LogicalKeyboardKey.keyA) ||
+        keysPressed.contains(LogicalKeyboardKey.arrowLeft);
+    final isRightKeyPressed = keysPressed.contains(LogicalKeyboardKey.keyD) ||
+        keysPressed.contains(LogicalKeyboardKey.arrowRight);
+
+    if (isLeftKeyPressed && isRightKeyPressed) {
+      playerDecrotion = PlayerDecrotion.none;
+    } else if (isLeftKeyPressed) {
+      playerDecrotion = PlayerDecrotion.left;
+    } else if (isRightKeyPressed) {
+      playerDecrotion = PlayerDecrotion.right;
+    } else {
+      playerDecrotion = PlayerDecrotion.none;
+    }
+    return super.onKeyEvent(event, keysPressed);
+  }
 
   //
   @override
